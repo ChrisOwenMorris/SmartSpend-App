@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- 🔷 TOP BAR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/gradient_header"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <!-- Hamburger Menu -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="☰"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"/>
+
+        <!-- Screen Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Goals"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- 🔹 CONTENT AREA -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <!-- Placeholder -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Goal Content Goes Here"
+            android:textSize="18sp"/>
+
+    </FrameLayout>
+
+</LinearLayout>
