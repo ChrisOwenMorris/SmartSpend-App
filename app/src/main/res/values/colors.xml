@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- SmartSpend brand colours -->
+    <color name="ss_blue">#0066CC</color>
+    <color name="ss_green">#10B981</color>
+    <color name="ss_blue_dark">#004EA8</color>
+    <color name="ss_green_dark">#0D9268</color>
+    <color name="ss_text_hint">#90A4AE</color>
+    <color name="ss_divider">#E0E0E0</color>
+    <color name="ss_background">#F5F7FA</color>
+    <color name="ss_card">#FFFFFF</color>
+    <color name="ss_error">#E53935</color>
+    <color name="ss_text_primary">#1A1A2E</color>
+    <color name="ss_text_secondary">#546E7A</color>
 </resources>
