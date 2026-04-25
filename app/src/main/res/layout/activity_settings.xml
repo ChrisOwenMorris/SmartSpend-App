@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F4F6F8">
 
-    <!-- 🔷 TOP BAR -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -13,37 +14,179 @@
         android:gravity="center_vertical"
         android:padding="16dp">
 
-        <!-- Hamburger Menu -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="☰"
-            android:textSize="24sp"
-            android:textColor="#FFFFFF"/>
-
-        <!-- Screen Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Settings"
-            android:textSize="20sp"
+            android:text="@string/settings"
             android:textColor="#FFFFFF"
-            android:layout_marginStart="16dp"/>
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp" />
     </LinearLayout>
 
-    <!-- 🔹 CONTENT AREA -->
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:fillViewport="true">
 
-        <!-- Placeholder -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Setting Content Goes Here"
-            android:textSize="18sp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    </FrameLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
 
+                <TextView
+                    android:text="@string/theme"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="@string/choose_your_preferred_display_mode"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/theme_placeholder"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@string/todo"
+                        android:src="@android:drawable/ic_menu_gallery"
+                        android:background="#DDDDDD"
+                        android:padding="8dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toEndOf="@id/theme_placeholder"
+                        android:layout_marginStart="12dp"
+                        android:layout_centerVertical="true"
+                        tools:ignore="RelativeOverlap">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/light_mode" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/light_theme_active" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:text="@string/security"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"/>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <ImageView android:id="@+id/lock_placeholder" android:layout_width="40dp" android:layout_height="40dp"
+                        android:contentDescription="@string/todo" android:src="@android:drawable/ic_menu_gallery" android:background="#DDDDDD" android:padding="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_toEndOf="@id/lock_placeholder" android:layout_marginStart="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/change_password" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/update_your_account_password" android:textSize="12sp"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/bio_placeholder" android:layout_width="40dp" android:layout_height="40dp"
+                        android:contentDescription="@string/todo"
+                        android:src="@android:drawable/ic_menu_gallery" android:background="#DDDDDD" android:padding="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_toEndOf="@id/bio_placeholder" android:layout_marginStart="12dp"
+                        tools:ignore="RelativeOverlap">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/biometric_login" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/use_fingerprint_or_face_id" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:checked="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:text="@string/notifications"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"/>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <ImageView android:id="@+id/alert_placeholder" android:layout_width="40dp" android:layout_height="40dp"
+                        android:contentDescription="@string/todo" android:src="@android:drawable/ic_menu_gallery" android:background="#DDDDDD" android:padding="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_toEndOf="@id/alert_placeholder" android:layout_marginStart="12dp"
+                        tools:ignore="RelativeOverlap">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/spending_alerts" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/get_notified_about_spending" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:checked="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <ImageView android:id="@+id/reminders_placeholder"
+                        android:layout_width="40dp" android:layout_height="40dp" android:contentDescription="@string/todo" android:src="@android:drawable/ic_menu_gallery" android:background="#DDDDDD" android:padding="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_toEndOf="@id/reminders_placeholder" android:layout_marginStart="12dp"
+                        tools:ignore="RelativeOverlap">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/reminders" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/bill_and_payment_reminders" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/goal_placeholder" android:layout_width="40dp"
+                        android:layout_height="40dp" android:contentDescription="@string/todo" android:src="@android:drawable/ic_menu_gallery" android:background="#DDDDDD" android:padding="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:layout_toEndOf="@id/goal_placeholder" android:layout_marginStart="12dp"
+                        tools:ignore="RelativeOverlap">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/goal_updates" android:textStyle="bold"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/progress_on_savings_goals" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:checked="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/save_settings"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/card_gradient_background"
+                android:padding="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
+                app:backgroundTint="@null"/>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

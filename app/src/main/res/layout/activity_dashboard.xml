@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -13,37 +14,159 @@
         android:gravity="center_vertical"
         android:padding="16dp">
 
-        <!-- Hamburger Menu -->
         <TextView
+            android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="☰"
             android:textSize="24sp"
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
 
-        <!-- Screen Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dashboard"
+            android:text="@string/dashboard"
             android:textSize="20sp"
             android:textColor="#FFFFFF"
             android:layout_marginStart="16dp"/>
     </LinearLayout>
 
-    <!-- 🔹 CONTENT AREA -->
-    <FrameLayout
+    <!-- CONTENT -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:background="#F0F4F8">
 
-        <!-- Placeholder -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dashboard Content Goes Here"
-            android:textSize="18sp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    </FrameLayout>
+            <!-- TOTAL BUDGET -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/total_monthly_budget"
+                    android:textColor="#888888"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tvTotalBudget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R 0.00"
+                    android:textColor="#1565C0"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <!-- OVERVIEW -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/this_month_s_overview"
+                android:layout_marginTop="16dp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginTop="12dp"
+                tools:ignore="DisableBaselineAlignment">
+
+                <!-- TOTAL SPENT -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/card_background"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_spent"/>
+
+                    <TextView
+                        android:id="@+id/tvTotalSpent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/r_0_00"/>
+                </LinearLayout>
+
+                <!-- REMAINING -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/card_background"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/remaining"/>
+
+                    <TextView
+                        android:id="@+id/tvRemaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R 0.00"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- PROGRESS -->
+            <ProgressBar
+                android:id="@+id/progressBudget"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:layout_marginTop="16dp"/>
+
+            <!-- BUTTON -->
+            <Button
+                android:id="@+id/btnQuickAddExpense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_expense"
+                android:layout_marginTop="16dp"/>
+
+            <!-- LIST -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentExpenses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
