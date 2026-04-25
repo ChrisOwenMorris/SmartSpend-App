@@ -1,49 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#F5F7FA">
 
-    <!-- 🔷 TOP BAR -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/gradient_header"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Hamburger Menu -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Toggle -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="☰"
-            android:textSize="24sp"
-            android:textColor="#FFFFFF"/>
+            android:background="@drawable/card_background"
+            android:padding="8dp"
+            android:orientation="horizontal">
 
-        <!-- Screen Title -->
+            <Button
+                android:id="@+id/btnExpense"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Expense"/>
+
+            <Button
+                android:id="@+id/btnIncome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Income"/>
+        </LinearLayout>
+
+        <!-- Amount -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Expenses"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginStart="16dp"/>
+            android:text="Amount"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/etAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="$ 0.00"
+            android:inputType="numberDecimal"
+            android:background="@drawable/card_background"
+            android:padding="12dp"/>
+
+        <!-- Category -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:layout_marginTop="12dp"/>
+
+        <Spinner
+            android:id="@+id/spCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background"/>
+
+        <!-- Date -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:layout_marginTop="12dp"/>
+
+        <EditText
+            android:id="@+id/etDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:background="@drawable/card_background"
+            android:padding="12dp"/>
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description (Optional)"
+            android:layout_marginTop="12dp"/>
+
+        <EditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="Add notes about this transaction..."
+            android:background="@drawable/card_background"
+            android:padding="12dp"/>
+
+        <!-- Summary -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transaction Summary"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/tvSummaryAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-$0.00"
+            android:textSize="26sp"
+            android:textColor="#FF0000"/>
+
+        <TextView
+            android:id="@+id/tvSummaryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"/>
+
+        <!-- Quick Add -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quick Add"
+            android:layout_marginTop="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Groceries\nR1200"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gas\nR700"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Coffee\nR35"/>
+        </LinearLayout>
+
     </LinearLayout>
-
-    <!-- 🔹 CONTENT AREA -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
-
-        <!-- Placeholder -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Expense Content Goes Here"
-            android:textSize="18sp"/>
-
-    </FrameLayout>
-
-</LinearLayout>
+</ScrollView>
