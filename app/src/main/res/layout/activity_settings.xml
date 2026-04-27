@@ -15,6 +15,14 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/btnMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="☰"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings"

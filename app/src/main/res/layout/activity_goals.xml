@@ -16,9 +16,10 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_menu_icon"
+            android:text="☰"
             android:textSize="24sp"
             android:textColor="#FFFFFF"/>
 
@@ -189,7 +190,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="60dp"
                             android:layout_marginTop="20dp"
-                            android:backgroundTint="@drawable/card_gradient_background"
+                            android:background="@drawable/card_gradient_background"
+                            app:backgroundTint="@null"
                             android:text="@string/create_new_goal"
                             android:textAllCaps="false"
                             android:textStyle="bold"
