@@ -84,7 +84,7 @@
     <string name="scan_or_capture_receipt">Scan or Capture Receipt</string>
     <string name="automatically_extract_data_using_ai">Automatically extract data using AI</string>
     <string name="upload_from_gallery">Upload from Gallery</string>
-    <string name="search_receipts">Search receipts...</string>
+    <string name="search_receipts">Search receipts…</string>
     <string name="recent_receipts">Recent Receipts</string>
     <string name="woolworths">Woolworths</string>
     <string name="text">☰</string>
@@ -103,4 +103,19 @@
     <string name="r_0_00">R 0.00</string>
     <string name="remaining">Remaining</string>
     <string name="add_expense">Add Expense</string>
+    <string name="title_expenses">Title Expenses\n</string>
+    <string name="label_expense">Expense\n</string>
+    <string name="label_income">Income\n</string>
+    <string name="hint_amount">Amount</string>
+    <string name="label_category">Category</string>
+    <string name="desc_category_spinner">desc_category_spinner</string>
+    <string name="label_date">Date</string>
+    <string name="hint_select_date">Select Date</string>
+    <string name="label_description_optional">Description Optional</string>
+    <string name="hint_notes">Notes</string>
+    <string name="label_summary">Summary</string>
+    <string name="label_quick_add">Quick Add</string>
+    <string name="quick_groceries">Quick Groceries</string>
+    <string name="quick_gas">Quick Gas</string>
+    <string name="quick_coffee">Quick Coffee</string>
 </resources>
