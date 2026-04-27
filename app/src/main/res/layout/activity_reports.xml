@@ -18,7 +18,7 @@
             android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="☰"
+            android:text="@string/text"
             android:textSize="24sp"
             android:textColor="#FFFFFF" />
 
@@ -68,7 +68,9 @@
 
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/btnWeek"
                         android:text="@string/btn_week"
+                        android:textColor="#FFFFFF"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
@@ -77,7 +79,9 @@
 
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/btnMonth"
                         android:text="@string/btn_month"
+                        android:textColor="#FFFFFF"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
@@ -86,7 +90,9 @@
 
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
+                        android:id="@+id/btnYear"
                         android:text="@string/btn_year"
+                        android:textColor="#FFFFFF"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
@@ -105,12 +111,14 @@
                 android:layout_marginBottom="12dp">
 
                 <TextView
+                    android:id="@+id/tvPeriodLabel"
                     android:text="@string/net_income_march_2026"
                     android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tvTotalAmount"
                     android:text="@string/r_4_570_20"
                     android:textColor="#FFFFFF"
                     android:textSize="30sp"
@@ -120,6 +128,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tvComparison"
                     android:text="@string/_18_from_february"
                     android:textColor="#DFFFE2"
                     android:layout_marginTop="6dp"
@@ -129,6 +138,7 @@
 
             <!-- CHART PLACEHOLDER -->
             <LinearLayout
+                android:id="@+id/layoutBarChart"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:background="@drawable/card_background"
@@ -144,6 +154,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tvBarChartPlaceholder"
                     android:text="@string/bar_chart_placeholder"
                     android:layout_marginTop="10dp"
                     android:layout_width="wrap_content"
@@ -152,6 +163,7 @@
 
             <!-- PIE CHART -->
             <LinearLayout
+                android:id="@+id/layoutPieChart"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:background="@drawable/card_background"
@@ -167,6 +179,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tvPieChartPlaceholder"
                     android:text="@string/pie_chart_placeholder"
                     android:layout_marginTop="10dp"
                     android:layout_width="wrap_content"
@@ -175,6 +188,7 @@
 
             <!-- LINE GRAPH -->
             <LinearLayout
+                android:id="@+id/layoutLineGraph"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:background="@drawable/card_background"
@@ -190,6 +204,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tvLineGraphPlaceholder"
                     android:text="@string/line_graph_placeholder"
                     android:layout_marginTop="10dp"
                     android:layout_width="wrap_content"
@@ -214,126 +229,17 @@
                     android:textColor="#111111"
                     android:layout_marginBottom="14dp"/>
 
-                <!-- ROW 1 -->
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTopMerchants"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="10dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:layout_marginEnd="12dp"
-                        android:contentDescription="@string/desc_merchant_logo" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/pizza_hut"
-                        android:textSize="16sp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/r245_60"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <!-- ROW 2 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="10dp">
-
-                    <ImageView
-                        android:contentDescription="@string/desc_merchant_logo"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:layout_marginEnd="12dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/shell_station"
-                        android:textSize="16sp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/r210_00"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <!-- ROW 3 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="10dp">
-
-                    <ImageView
-                        android:contentDescription="@string/desc_merchant_logo"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:layout_marginEnd="12dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/target_store"
-                        android:textSize="16sp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/r568_90"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <!-- ROW 4 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="10dp">
-
-                    <ImageView
-                        android:contentDescription="@string/desc_merchant_logo"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:layout_marginEnd="12dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/starbucks"
-                        android:textSize="16sp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/r156_40"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                    android:nestedScrollingEnabled="false"/>
 
             </LinearLayout>
 
             <!-- EXPORT BUTTON -->
             <Button
+                android:id="@+id/btnExport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/export_report_pdf"
