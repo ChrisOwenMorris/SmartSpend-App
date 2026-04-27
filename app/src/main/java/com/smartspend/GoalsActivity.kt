@@ -4,9 +4,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 class GoalsActivity : AppCompatActivity() {
+
+    private val db by lazy {
+        (application as SmartSpendApp).database
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // This links the Kotlin logic to your activity_goals.xml layout
         setContentView(R.layout.activity_goals)
     }
 }

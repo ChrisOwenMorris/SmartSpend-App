@@ -5,6 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 
 class ReceiptActivity : AppCompatActivity() {
 
+    private val db by lazy {
+        (application as SmartSpendApp).database
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
