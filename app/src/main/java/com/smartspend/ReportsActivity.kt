@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.annotation.SuppressLint
 
+@SuppressLint("NewApi")
 @RequiresApi(Build.VERSION_CODES.O)
 class ReportsActivity : AppCompatActivity() {
 
