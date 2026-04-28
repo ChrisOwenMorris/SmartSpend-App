@@ -210,7 +210,14 @@
                     android:textStyle="bold"
                     android:textColor="#111111"
                     tools:ignore="HardcodedText" />
+
+
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/recentReceiptsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
 
         </LinearLayout>
     </ScrollView>
