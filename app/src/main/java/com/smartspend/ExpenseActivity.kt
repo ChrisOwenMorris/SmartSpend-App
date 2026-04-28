@@ -31,6 +31,8 @@ class ExpenseActivity : AppCompatActivity() {
 
     private lateinit var btnSave: Button
 
+    private var receiptPath: String? = null
+
     private var isExpense = true
     private val calendar = Calendar.getInstance()
 
@@ -40,12 +42,16 @@ class ExpenseActivity : AppCompatActivity() {
 
         NavigationHelper.setupMenu(this)
 
+        receiptPath = intent.getStringExtra("receiptPath")
+
         bindViews()
         setupDatePicker()
         setupListeners()
         setupCategorySpinner()
         updateDate()
         updateSummary()
+
+
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -166,7 +172,7 @@ class ExpenseActivity : AppCompatActivity() {
                     startTime = "00:00",
                     endTime = "00:00",
                     categoryId = categoryId,
-                    receiptPath = null
+                    receiptPath = receiptPath,
                 )
             )
 
