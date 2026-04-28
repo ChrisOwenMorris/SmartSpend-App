@@ -79,6 +79,18 @@
                 android:layout_marginTop="16dp"
                 android:textStyle="bold"/>
 
+            <TextView
+                android:id="@+id/tvTransactionCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Transactions: 0" />
+
+            <TextView
+                android:id="@+id/tvLatestExpense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Latest: None" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
