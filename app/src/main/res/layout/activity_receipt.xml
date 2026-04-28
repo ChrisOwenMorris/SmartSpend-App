@@ -44,6 +44,7 @@
             android:padding="16dp">
 
             <LinearLayout
+                android:id="@+id/topCardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
                 android:orientation="vertical"
@@ -86,6 +87,14 @@
                 android:layout_marginBottom="16dp"
                 app:backgroundTint="@null"/>
 
+            <ImageView
+                android:id="@+id/ivReceiptPreview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp"/>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,7 +129,7 @@
                 <ImageView
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:src="@android:drawable/ic_menu_gallery"
+                    android:id="@+id/imgReceipt1"
                     android:background="#F0F0F0"
                     android:padding="8dp"
                     android:layout_marginEnd="12dp"
