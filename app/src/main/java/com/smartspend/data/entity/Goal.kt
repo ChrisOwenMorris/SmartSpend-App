@@ -5,8 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "goals")
 data class Goal(
-    @PrimaryKey(autoGenerate = true)
-    val goalId: Int = 0,
-    val minGoal: Double,
-    val maxGoal: Double
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val targetAmount: Double,
+    val minMonthly: Double,
+    val maxMonthly: Double,
+    val targetDate: String
 )
