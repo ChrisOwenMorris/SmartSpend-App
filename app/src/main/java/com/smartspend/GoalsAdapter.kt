@@ -48,10 +48,13 @@ class GoalsAdapter(
         holder.progressGoalItem.progress = percentage
 
         // Set Amounts (Ensure R.string.goal_amount_format exists in strings.xml)
+        val current = goal.currentAmount.toString().toDoubleOrNull() ?: 0.0
+        val target = goal.targetAmount.toString().toDoubleOrNull() ?: 0.0
+
         holder.tvGoalCurrentAmount.text = ctx.getString(
             R.string.goal_amount_format,
-            goal.currentAmount,
-            goal.targetAmount
+            current,
+            target
         )
 
         // Set Percentage Text

@@ -11,6 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import androidx.appcompat.app.AlertDialog
+import android.widget.EditText
+import android.widget.Toast
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -33,6 +36,10 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ExpenseActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnSetBudget).setOnClickListener {
+            showSetBudgetDialog()
+        }
+
         loadDashboardData()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -40,6 +47,37 @@ class DashboardActivity : AppCompatActivity() {
                 finishAffinity()
             }
         })
+    }
+
+    // --- FIXED: Added the missing dialog function ---
+    private fun showSetBudgetDialog() {
+        val prefs = getSharedPreferences("SmartSpendPrefs", MODE_PRIVATE)
+        val currentBudget = prefs.getFloat("monthly_budget", 0f)
+
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            hint = "e.g. 5000"
+            // If a budget already exists, show it in the field
+            if (currentBudget > 0f) setText(currentBudget.toString())
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Set Monthly Budget")
+            .setMessage("Enter your budget for the month (This will sync with your dashboard)")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val budgetString = input.text.toString()
+                if (budgetString.isNotEmpty()) {
+                    val budget = budgetString.toFloat()
+                    prefs.edit().putFloat("monthly_budget", budget).apply()
+
+                    // Refresh data after saving
+                    loadDashboardData()
+                    Toast.makeText(this, "Budget saved!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun loadDashboardData() {
@@ -50,9 +88,13 @@ class DashboardActivity : AppCompatActivity() {
                 val count = expenses.size
                 val latest = expenses.lastOrNull()
 
-                // Load goal for budget calculation
+                // Logic maintained: Checking shared prefs first, then falling back to Goal
+                val prefs = getSharedPreferences("SmartSpendPrefs", MODE_PRIVATE)
+                val savedBudget = prefs.getFloat("monthly_budget", 0f).toDouble()
+
                 val goal = db.goalDao().getFeaturedGoal()
-                val budget = goal?.targetAmount ?: 0.0
+                val budget = if (savedBudget > 0) savedBudget else (goal?.targetAmount ?: 0.0)
+
                 val remaining = budget - total
                 val progress = if (budget > 0) ((total / budget) * 100).toInt() else 0
 

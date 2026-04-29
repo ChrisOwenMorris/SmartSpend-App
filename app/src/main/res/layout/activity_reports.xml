@@ -138,12 +138,11 @@
 
             <!-- CHART PLACEHOLDER -->
             <LinearLayout
-                android:id="@+id/layoutBarChart"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_background"
-                android:gravity="center"
                 android:orientation="vertical"
+                android:padding="16dp"
                 android:layout_marginBottom="12dp">
 
                 <TextView
@@ -151,25 +150,29 @@
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"/>
 
-                <TextView
-                    android:id="@+id/tvBarChartPlaceholder"
-                    android:text="@string/bar_chart_placeholder"
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                <com.smartspend.IncomeExpenseBarChartView
+                    android:id="@+id/incomeExpenseChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
             </LinearLayout>
 
             <!-- PIE CHART -->
             <LinearLayout
-                android:id="@+id/layoutPieChart"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_background"
-                android:gravity="center"
                 android:orientation="vertical"
                 android:layout_marginBottom="12dp">
+
+                <com.smartspend.PieChartView
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:gravity="center" />
 
                 <TextView
                     android:text="@string/spending_by_category"
@@ -190,25 +193,27 @@
             <LinearLayout
                 android:id="@+id/layoutLineGraph"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_background"
-                android:gravity="center"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
+                android:padding="16dp"
                 android:layout_marginBottom="12dp">
 
                 <TextView
                     android:text="@string/_6_month_trends"
                     android:textStyle="bold"
                     android:textSize="18sp"
+                    android:textColor="@color/black"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
 
-                <TextView
-                    android:id="@+id/tvLineGraphPlaceholder"
-                    android:text="@string/line_graph_placeholder"
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                <com.smartspend.TrendChartView
+                    android:id="@+id/trendChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
+
             </LinearLayout>
 
             <!-- TOP MERCHANTS -->

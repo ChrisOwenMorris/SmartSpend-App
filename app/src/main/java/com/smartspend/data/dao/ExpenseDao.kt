@@ -37,6 +37,24 @@ interface ExpenseDao {
         LIMIT 4
     """)
     suspend fun getTopCategoriesWithNames(startDate: String, endDate: String): List<CategoryWithTotal>
+
+    @Query("""
+    SELECT c.categoryName, SUM(e.amount) as total 
+    FROM expenses e 
+    INNER JOIN categories c ON e.categoryId = c.categoryId 
+    WHERE e.date BETWEEN :startDate AND :endDate 
+    GROUP BY c.categoryName
+""")
+    suspend fun getExpensesGroupedByCategory(startDate: String, endDate: String): List<CategorySummary>
+
+    @Query("""
+    SELECT strftime('%m', date) as month, SUM(amount) as total 
+    FROM expenses 
+    WHERE date >= :sixMonthsAgo 
+    GROUP BY month 
+    ORDER BY date ASC
+""")
+    suspend fun getMonthlyTrends(sixMonthsAgo: String): List<TrendSummary>
 }
 
 data class CategoryTotal(
@@ -46,5 +64,15 @@ data class CategoryTotal(
 
 data class CategoryWithTotal(
     val categoryName: String,
+    val total: Double
+)
+
+data class CategorySummary(
+    val categoryName: String,
+    val total: Double
+)
+
+data class TrendSummary(
+    val month: String,
     val total: Double
 )
