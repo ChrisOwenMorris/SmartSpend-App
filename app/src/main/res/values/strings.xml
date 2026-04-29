@@ -126,4 +126,39 @@
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="enter_current_password">Enter current password</string>
     <string name="enter_new_password">Enter new password</string>
+    <string name="goal_image">Goal image</string>
+    <string name="tap_to_upload_image">Tap to upload image</string>
+    <string name="add_savings">+ Add Savings to This Goal</string>
+    <string name="update_goal">Update Goal Amount</string>
+    <string name="upload_goal_image">Upload Goal Image (Optional)</string>
+    <string name="all_goals">All Goals</string>
+    <string name="_0">0%</string>
+    <string name="no_goals_yet">No goals yet</string>
+    <string name="target_date_format">Target: %1$s</string>
+    <string name="goal_created">Goal created successfully!</string>
+    <string name="savings_added">Savings added successfully!</string>
+    <string name="goal_updated">Goal updated successfully!</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="goal_completed_message">You completed your goal: %1$s! Moving to the next goal.</string>
+    <string name="next_goal">View Next Goal</string>
+    <string name="add_savings_to">Add savings to %1$s</string>
+    <string name="update_goal_amount">Update: %1$s</string>
+    <string name="current_saved_of" formatted="false">Currently saved: R %.2f of R %.2f</string>
+    <string name="select_goal_to_update">Select Goal to Update</string>
+    <string name="enter_goal_name">Please enter a goal name</string>
+    <string name="enter_goal_amount">Please enter a goal amount</string>
+    <string name="enter_target_date">Please select a target date</string>
+    <string name="invalid_amount">Please enter a valid amount</string>
+    <string name="enter_amount">Enter amount (R)</string>
+    <string name="image_selected">Image selected ✓</string>
+    <string name="add">Add</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
+    <string name="amount_zero">R 0.00</string>
+    <string name="percentage_zero">0%</string>
+    <string name="percentage_format">%d%%</string>
+    <string name="goal_amount_format" formatted="false">R %.2f / R %.2f</string>
+    <string name="goal_progress_chart">Goal progress chart</string>
+    <string name="menu_button_description">Open menu</string>
+    <string name="camera_image_captured">Camera image captured</string>
 </resources>

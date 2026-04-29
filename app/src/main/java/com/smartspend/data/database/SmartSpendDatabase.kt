@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.smartspend.data.dao.ExpenseDao
 import com.smartspend.data.dao.UserDao
+import com.smartspend.data.dao.GoalDao
 import com.smartspend.data.entity.Category
 import com.smartspend.data.entity.Expense
 import com.smartspend.data.entity.Goal
@@ -19,9 +20,8 @@ import com.smartspend.data.entity.User
 abstract class SmartSpendDatabase : RoomDatabase() {
 
     abstract fun expenseDao(): ExpenseDao
-    abstract fun goalDao(): GoalDao
-
     abstract fun userDao(): UserDao
+    abstract fun goalDao(): GoalDao
 
     companion object {
         @Volatile

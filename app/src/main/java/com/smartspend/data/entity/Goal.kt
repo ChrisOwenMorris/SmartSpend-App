@@ -5,10 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "goals")
 data class Goal(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String,
+    @PrimaryKey(autoGenerate = true)
+    val goalId: Int = 0,
+    val goalName: String,
     val targetAmount: Double,
-    val minMonthly: Double,
-    val maxMonthly: Double,
-    val targetDate: String
+    val currentAmount: Double = 0.0,
+    val targetDate: String,
+    val imagePath: String? = null,
+    val isCompleted: Boolean = false
 )

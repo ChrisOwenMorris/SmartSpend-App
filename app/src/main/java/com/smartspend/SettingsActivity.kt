@@ -1,21 +1,24 @@
 package com.smartspend
 
-import android.app.AppOpsManager
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
@@ -28,10 +31,26 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
+    // --- NOTIFICATION PERMISSION LAUNCHER --- //
+    private val requestNotificationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(this, "Notifications enabled", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(
+                this,
+                "Notification permission denied. Enable it in device Settings.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // --- EXISTING NAVIGATION CODE --- //
         NavigationHelper.setupMenu(this)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -41,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         })
 
         // --- SHARED PREFERENCES --- //
-        prefs = getSharedPreferences("smartspend_prefs", Context.MODE_PRIVATE)
+        prefs = getSharedPreferences("smartspend_prefs", MODE_PRIVATE)
 
         // --- VIEWS --- //
         val switchTheme = findViewById<SwitchMaterial>(R.id.switchTheme)
@@ -68,6 +87,17 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        // --- NOTIFICATION SWITCHES — request permission when turning on --- //
+        switchSpendingAlerts.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) requestNotificationPermissionIfNeeded()
+        }
+        switchReminders.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) requestNotificationPermissionIfNeeded()
+        }
+        switchGoalUpdates.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) requestNotificationPermissionIfNeeded()
+        }
+
         // --- CHANGE PASSWORD --- //
         btnChangePassword.setOnClickListener {
             showChangePasswordDialog()
@@ -75,15 +105,16 @@ class SettingsActivity : AppCompatActivity() {
 
         // --- SAVE SETTINGS --- //
         btnSaveSettings.setOnClickListener {
-            prefs.edit()
-                .putBoolean("dark_mode", switchTheme.isChecked)
-                .putBoolean("biometric_enabled", switchBiometric.isChecked)
-                .putBoolean("spending_alerts", switchSpendingAlerts.isChecked)
-                .putBoolean("reminders", switchReminders.isChecked)
-                .putBoolean("goal_updates", switchGoalUpdates.isChecked)
-                .apply()
 
-            // Send test notifications for enabled ones
+            // KTX edit extension — fixes "Use KTX extension" warning
+            prefs.edit {
+                putBoolean("dark_mode", switchTheme.isChecked)
+                putBoolean("biometric_enabled", switchBiometric.isChecked)
+                putBoolean("spending_alerts", switchSpendingAlerts.isChecked)
+                putBoolean("reminders", switchReminders.isChecked)
+                putBoolean("goal_updates", switchGoalUpdates.isChecked)
+            }
+
             if (switchSpendingAlerts.isChecked) {
                 sendNotification(
                     "Spending Alert",
@@ -107,6 +138,25 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // --- REQUEST NOTIFICATION PERMISSION (Android 13+) --- //
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )) {
+                PackageManager.PERMISSION_GRANTED -> {
+                    // Already granted — nothing to do
+                }
+                else -> {
+                    requestNotificationPermission.launch(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
         }
     }
 
@@ -135,9 +185,7 @@ class SettingsActivity : AppCompatActivity() {
                     new.length < 6 -> {
                         Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
                     }
-                    else -> {
-                        updatePassword(current, new)
-                    }
+                    else -> updatePassword(current, new)
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -181,12 +229,33 @@ class SettingsActivity : AppCompatActivity() {
                 "SmartSpend Notifications",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            getSystemService(NotificationManager::class.java)
+                .createNotificationChannel(channel)
         }
 
-        if (!areNotificationsEnabled()) {
-            Toast.makeText(this, "Please enable notifications for SmartSpend in settings", Toast.LENGTH_LONG).show()
+        // Check POST_NOTIFICATIONS permission on Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Toast.makeText(
+                    this,
+                    "Please enable notifications for SmartSpend in settings",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+        }
+
+        // Check if notifications are enabled at the app level
+        if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+            Toast.makeText(
+                this,
+                "Please enable notifications for SmartSpend in settings",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
 
@@ -198,11 +267,14 @@ class SettingsActivity : AppCompatActivity() {
             .setAutoCancel(true)
             .build()
 
-        NotificationManagerCompat.from(this).notify(notificationId, notification)
-    }
-
-    // --- CHECK IF NOTIFICATIONS ARE ENABLED --- //
-    private fun areNotificationsEnabled(): Boolean {
-        return NotificationManagerCompat.from(this).areNotificationsEnabled()
+        try {
+            NotificationManagerCompat.from(this).notify(notificationId, notification)
+        } catch (_: SecurityException) {
+            Toast.makeText(
+                this,
+                "Please enable notifications for SmartSpend in settings",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }

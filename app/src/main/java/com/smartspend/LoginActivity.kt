@@ -1,7 +1,6 @@
 package com.smartspend
 
-import
-android.content.Intent
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -11,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 
 class LoginActivity : AppCompatActivity() {
 
@@ -43,9 +43,11 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             } else {
-                sharedPrefs.edit()
-                    .putBoolean("normal_login_done", true)
-                    .apply()
+                // Fix: Using the KTX extension prefs.edit { ... }
+                sharedPrefs.edit {
+                    putBoolean("normal_login_done", true)
+                    putString("logged_in_email", email)
+                }
 
                 goToDashboard()
             }
@@ -67,23 +69,20 @@ class LoginActivity : AppCompatActivity() {
     private fun startBiometricLogin() {
         val biometricManager = BiometricManager.from(this)
 
+        // Using BIOMETRIC_STRONG or BIOMETRIC_WEAK depending on security needs
         when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
                 showBiometricPrompt()
             }
-
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
                 Toast.makeText(this, "No biometric hardware found", Toast.LENGTH_SHORT).show()
             }
-
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
                 Toast.makeText(this, "Biometric hardware unavailable", Toast.LENGTH_SHORT).show()
             }
-
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
                 Toast.makeText(this, "No fingerprint or face unlock is set up", Toast.LENGTH_SHORT).show()
             }
-
             else -> {
                 Toast.makeText(this, "Biometric login is not available", Toast.LENGTH_SHORT).show()
             }
@@ -97,7 +96,6 @@ class LoginActivity : AppCompatActivity() {
             this,
             executor,
             object : BiometricPrompt.AuthenticationCallback() {
-
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
 
@@ -109,7 +107,6 @@ class LoginActivity : AppCompatActivity() {
                             "Biometric login successful",
                             Toast.LENGTH_SHORT
                         ).show()
-
                         goToDashboard()
                     } else {
                         Toast.makeText(
@@ -122,22 +119,12 @@ class LoginActivity : AppCompatActivity() {
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        errString.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@LoginActivity, errString.toString(), Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Biometric authentication failed",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@LoginActivity, "Biometric authentication failed", Toast.LENGTH_SHORT).show()
                 }
             }
         )

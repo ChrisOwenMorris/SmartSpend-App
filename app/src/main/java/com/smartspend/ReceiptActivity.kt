@@ -1,17 +1,16 @@
 package com.smartspend
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
@@ -25,9 +24,31 @@ class ReceiptActivity : AppCompatActivity() {
     private lateinit var recentImage: ImageView
     private var imageUri: Uri? = null
 
-    companion object {
-        private const val CAMERA_REQUEST = 100
-        private const val GALLERY_REQUEST = 200
+    // FIX 1: Replace startActivityForResult(CAMERA_REQUEST) with Activity Result API
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        bitmap?.let {
+            previewImage.setImageBitmap(it)
+            previewImage.visibility = ImageView.VISIBLE
+            Toast.makeText(this, getString(R.string.camera_image_captured), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // FIX 2: Replace startActivityForResult(GALLERY_REQUEST) with Activity Result API
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            previewImage.setImageURI(it)
+            previewImage.visibility = ImageView.VISIBLE
+
+            // Send to Expense screen
+            val intent = android.content.Intent(this, ExpenseActivity::class.java)
+            intent.putExtra("receiptPath", it.toString())
+            startActivity(intent)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,38 +57,30 @@ class ReceiptActivity : AppCompatActivity() {
 
         NavigationHelper.setupMenu(this)
 
-
         val btnGallery = findViewById<Button>(R.id.btnGallery)
         val cameraCard = findViewById<LinearLayout>(R.id.topCardContainer)
 
         previewImage = findViewById(R.id.ivReceiptPreview)
-
-
         recentImage = findViewById(R.id.imgReceipt1)
-
 
         cameraCard?.setOnClickListener {
             openCamera()
         }
 
-
         btnGallery.setOnClickListener {
             openGallery()
         }
 
-
         lifecycleScope.launch {
             val expenses = db.expenseDao().getAllExpenses()
-
             if (expenses.isNotEmpty()) {
                 val latest = expenses.last()
-
+                // FIX 3: Replace deprecated bundle.get("data") / Uri.parse() with toUri() KTX
                 latest.receiptPath?.let {
-                    recentImage.setImageURI(Uri.parse(it))
+                    recentImage.setImageURI(it.toUri())
                 }
             }
         }
-
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -77,41 +90,10 @@ class ReceiptActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, CAMERA_REQUEST)
+        cameraLauncher.launch(null)
     }
 
     private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, GALLERY_REQUEST)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-
-            when (requestCode) {
-
-                CAMERA_REQUEST -> {
-                    val photo = data?.extras?.get("data") as Bitmap
-                    previewImage.setImageBitmap(photo)
-                    previewImage.visibility = ImageView.VISIBLE
-
-                    Toast.makeText(this, "Camera image captured", Toast.LENGTH_SHORT).show()
-                }
-
-                GALLERY_REQUEST -> {
-                    imageUri = data?.data
-                    previewImage.setImageURI(imageUri)
-                    previewImage.visibility = ImageView.VISIBLE
-
-                    // 🔥 SEND TO EXPENSE SCREEN
-                    val intent = Intent(this, ExpenseActivity::class.java)
-                    intent.putExtra("receiptPath", imageUri.toString())
-                    startActivity(intent)
-                }
-            }
-        }
+        galleryLauncher.launch("image/*")
     }
 }
