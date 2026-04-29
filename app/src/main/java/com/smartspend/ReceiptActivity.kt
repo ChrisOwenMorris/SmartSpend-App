@@ -106,7 +106,7 @@ class ReceiptActivity : AppCompatActivity() {
                     previewImage.setImageURI(imageUri)
                     previewImage.visibility = ImageView.VISIBLE
 
-                    // 🔥 SEND TO EXPENSE SCREEN
+                    //  SEND TO EXPENSE SCREEN
                     val intent = Intent(this, ExpenseActivity::class.java)
                     intent.putExtra("receiptPath", imageUri.toString())
                     startActivity(intent)
