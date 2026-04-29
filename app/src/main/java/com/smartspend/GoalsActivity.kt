@@ -28,7 +28,7 @@ class GoalsActivity : AppCompatActivity() {
     private var featuredGoal: Goal? = null
     private lateinit var goalsAdapter: GoalsAdapter
 
-    // Image picker
+    // Image picker for creating a new goal
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -39,7 +39,7 @@ class GoalsActivity : AppCompatActivity() {
         }
     }
 
-    // Featured image picker
+    // Featured image picker for updating existing featured goal
     private val featuredImagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -58,7 +58,9 @@ class GoalsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_goals)
 
+        // Linking Navigation Helper to the menu button ID from your XML
         NavigationHelper.setupMenu(this)
+
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 NavigationHelper.goToDashboard(this@GoalsActivity)
@@ -82,18 +84,17 @@ class GoalsActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-
-        // Featured image tap
+        // Featured image tap (Frame holding the image)
         findViewById<FrameLayout>(R.id.frameFeaturedImage).setOnClickListener {
             featuredImagePickerLauncher.launch("image/*")
         }
 
-        // Image upload for new goal
+        // Image upload layout for new goal
         findViewById<LinearLayout>(R.id.layoutUploadImage).setOnClickListener {
             imagePickerLauncher.launch("image/*")
         }
 
-        // Target date picker
+        // Target date picker (TextInputEditText)
         findViewById<TextInputEditText>(R.id.etTargetDate).setOnClickListener {
             showDatePicker { date ->
                 findViewById<TextInputEditText>(R.id.etTargetDate).setText(date)
@@ -126,7 +127,6 @@ class GoalsActivity : AppCompatActivity() {
                     ((goal.currentAmount / goal.targetAmount) * 100).toFloat()
                 else 0f
 
-                // Check if goal is completed
                 if (percentage >= 100f) {
                     db.goalDao().markAsCompleted(goal.goalId)
                     showCongratulationsCard()
@@ -143,9 +143,11 @@ class GoalsActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tvFeaturedGoalAmount).text =
                         getString(R.string.amount_format, goal.targetAmount)
                     findViewById<TextView>(R.id.tvFeaturedGoalPercentage).text =
-                        getString(R.string.percentage_format, percentage.toInt())
+                        "${percentage.toInt()}%"
                     findViewById<ProgressBar>(R.id.progressFeaturedGoal).progress =
                         percentage.toInt()
+
+                    // Custom PieChartView logic
                     findViewById<PieChartView>(R.id.pieChartFeatured).setPercentage(percentage)
 
                     goal.imagePath?.let { path ->
@@ -158,9 +160,9 @@ class GoalsActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tvFeaturedGoalTitle).text =
                         getString(R.string.no_goals_yet)
                     findViewById<TextView>(R.id.tvFeaturedGoalDate).text = ""
-                    findViewById<TextView>(R.id.tvFeaturedCurrentAmount).setText(R.string.amount_zero)
-                    findViewById<TextView>(R.id.tvFeaturedGoalAmount).setText(R.string.amount_zero)
-                    findViewById<TextView>(R.id.tvFeaturedGoalPercentage).setText(R.string.percentage_zero)
+                    findViewById<TextView>(R.id.tvFeaturedCurrentAmount).text = "R 0"
+                    findViewById<TextView>(R.id.tvFeaturedGoalAmount).text = "R 0"
+                    findViewById<TextView>(R.id.tvFeaturedGoalPercentage).text = "0%"
                     findViewById<ProgressBar>(R.id.progressFeaturedGoal).progress = 0
                     findViewById<PieChartView>(R.id.pieChartFeatured).setPercentage(0f)
                 }
@@ -184,22 +186,22 @@ class GoalsActivity : AppCompatActivity() {
 
         when {
             name.isEmpty() -> {
-                Toast.makeText(this, getString(R.string.enter_goal_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Enter goal name", Toast.LENGTH_SHORT).show()
                 return
             }
             amountStr.isEmpty() -> {
-                Toast.makeText(this, getString(R.string.enter_goal_amount), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Enter goal amount", Toast.LENGTH_SHORT).show()
                 return
             }
             date.isEmpty() -> {
-                Toast.makeText(this, getString(R.string.enter_target_date), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Enter target date", Toast.LENGTH_SHORT).show()
                 return
             }
         }
 
         val amount = amountStr.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            Toast.makeText(this, getString(R.string.invalid_amount), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -213,19 +215,13 @@ class GoalsActivity : AppCompatActivity() {
                 )
             )
             runOnUiThread {
-                Toast.makeText(
-                    this@GoalsActivity,
-                    getString(R.string.goal_created),
-                    Toast.LENGTH_SHORT
-                ).show()
-                // Clear form
+                Toast.makeText(this@GoalsActivity, "Goal created", Toast.LENGTH_SHORT).show()
+                // Reset Form
                 findViewById<TextInputEditText>(R.id.etGoalName).text?.clear()
                 findViewById<TextInputEditText>(R.id.etGoalAmount).text?.clear()
                 findViewById<TextInputEditText>(R.id.etTargetDate).text?.clear()
-                findViewById<ImageView>(R.id.ivNewGoalImage)
-                    .setImageResource(android.R.drawable.ic_menu_camera)
-                findViewById<TextView>(R.id.tvUploadImage).text =
-                    getString(R.string.upload_goal_image)
+                findViewById<ImageView>(R.id.ivNewGoalImage).setImageResource(android.R.drawable.ic_menu_camera)
+                findViewById<TextView>(R.id.tvUploadImage).text = "Upload Goal Image"
                 selectedImageUri = null
             }
             loadAllGoals()
@@ -235,28 +231,28 @@ class GoalsActivity : AppCompatActivity() {
 
     private fun showAddSavingsDialog() {
         val goal = featuredGoal ?: run {
-            Toast.makeText(this, getString(R.string.no_goals_yet), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No goals yet", Toast.LENGTH_SHORT).show()
             return
         }
 
         val input = EditText(this).apply {
-            hint = getString(R.string.enter_amount)
+            hint = "Enter amount"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or
                     android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
             setPadding(48, 32, 48, 32)
         }
 
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.add_savings_to, goal.goalName))
+            .setTitle("Add Savings to ${goal.goalName}")
             .setView(input)
-            .setPositiveButton(getString(R.string.add)) { _, _ ->
+            .setPositiveButton("Add") { _, _ ->
                 val amount = input.text.toString().toDoubleOrNull()
                 if (amount != null && amount > 0) {
                     lifecycleScope.launch {
                         val newAmount = goal.currentAmount + amount
                         db.goalDao().updateCurrentAmount(goal.goalId, newAmount)
 
-                        // Also add as expense
+                        // Register as expense (linking with Expense entity)
                         db.expenseDao().insert(
                             com.smartspend.data.entity.Expense(
                                 amount = amount,
@@ -270,20 +266,16 @@ class GoalsActivity : AppCompatActivity() {
                         )
 
                         runOnUiThread {
-                            Toast.makeText(
-                                this@GoalsActivity,
-                                getString(R.string.savings_added),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@GoalsActivity, "Savings added", Toast.LENGTH_SHORT).show()
                         }
                         loadFeaturedGoal()
                         loadAllGoals()
                     }
                 } else {
-                    Toast.makeText(this, getString(R.string.invalid_amount), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton(getString(R.string.cancel), null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
@@ -292,11 +284,7 @@ class GoalsActivity : AppCompatActivity() {
             val goals = db.goalDao().getActiveGoals()
             if (goals.isEmpty()) {
                 runOnUiThread {
-                    Toast.makeText(
-                        this@GoalsActivity,
-                        getString(R.string.no_goals_yet),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@GoalsActivity, "No goals yet", Toast.LENGTH_SHORT).show()
                 }
                 return@launch
             }
@@ -305,11 +293,11 @@ class GoalsActivity : AppCompatActivity() {
 
             runOnUiThread {
                 AlertDialog.Builder(this@GoalsActivity)
-                    .setTitle(getString(R.string.select_goal_to_update))
+                    .setTitle("Select goal to update")
                     .setItems(goalNames) { _, index ->
                         showUpdateGoalDialog(goals[index])
                     }
-                    .setNegativeButton(getString(R.string.cancel), null)
+                    .setNegativeButton("Cancel", null)
                     .show()
             }
         }
@@ -317,57 +305,42 @@ class GoalsActivity : AppCompatActivity() {
 
     private fun showUpdateGoalDialog(goal: Goal) {
         val input = EditText(this).apply {
-            hint = getString(R.string.enter_amount)
+            hint = "Enter additional amount"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or
                     android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
             setPadding(48, 32, 48, 32)
         }
 
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.update_goal_amount, goal.goalName))
-            .setMessage(
-                getString(
-                    R.string.current_saved_of,
-                    goal.currentAmount,
-                    goal.targetAmount
-                )
-            )
+            .setTitle("Update ${goal.goalName}")
+            .setMessage("Current: R ${goal.currentAmount} / R ${goal.targetAmount}")
             .setView(input)
-            .setPositiveButton(getString(R.string.update)) { _, _ ->
+            .setPositiveButton("Update") { _, _ ->
                 val amount = input.text.toString().toDoubleOrNull()
                 if (amount != null && amount > 0) {
                     lifecycleScope.launch {
                         val newAmount = goal.currentAmount + amount
                         db.goalDao().updateCurrentAmount(goal.goalId, newAmount)
                         runOnUiThread {
-                            Toast.makeText(
-                                this@GoalsActivity,
-                                getString(R.string.goal_updated),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@GoalsActivity, "Goal updated", Toast.LENGTH_SHORT).show()
                         }
                         loadFeaturedGoal()
                         loadAllGoals()
                     }
                 } else {
-                    Toast.makeText(this, getString(R.string.invalid_amount), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton(getString(R.string.cancel), null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun showCongratulationsCard() {
         runOnUiThread {
             AlertDialog.Builder(this)
-                .setTitle("🎉 " + getString(R.string.congratulations))
-                .setMessage(
-                    getString(
-                        R.string.goal_completed_message,
-                        featuredGoal?.goalName ?: ""
-                    )
-                )
-                .setPositiveButton(getString(R.string.next_goal), null)
+                .setTitle("🎉 Congratulations!")
+                .setMessage("You've reached your goal: ${featuredGoal?.goalName ?: ""}")
+                .setPositiveButton("Awesome!", null)
                 .show()
         }
     }
@@ -377,7 +350,8 @@ class GoalsActivity : AppCompatActivity() {
         DatePickerDialog(
             this,
             { _, year, month, day ->
-                onDateSelected("$year-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}")
+                val selectedDate = "$year-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
+                onDateSelected(selectedDate)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),

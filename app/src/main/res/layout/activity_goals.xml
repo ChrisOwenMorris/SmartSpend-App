@@ -16,10 +16,6 @@
         android:gravity="center_vertical"
         android:padding="16dp">
 
-        <!-- FIX 1: Insufficient text color contrast — changed #FFFFFF on gradient to enforce
-             contrast by adding a dark shadow via textStyle or use a guaranteed contrast color.
-             Using #FFFFFF is fine IF the gradient is dark enough; added contentDescription
-             for accessibility on the menu button. -->
         <TextView
             android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
@@ -32,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/savings_goals"
+            android:text="@string/goals"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"

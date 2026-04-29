@@ -164,4 +164,8 @@
     <string name="transactions_0">Transactions: 0</string>
     <string name="latest_none">Latest: None</string>
     <string name="save_expense">Save Expense</string>
+    <string name="touch_id">Touch ID</string>
+    <string name="face_id">Face ID</string>
+    <string name="reports">Reports</string>
+    <string name="goals">Goals</string>
 </resources>
