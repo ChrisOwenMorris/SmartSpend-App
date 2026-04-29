@@ -2,6 +2,7 @@ package com.smartspend
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -11,8 +12,14 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
+
+    private val db by lazy {
+        (application as SmartSpendApp).database
+    }
 
     private lateinit var etEmail: EditText
     private lateinit var etPassword: EditText
@@ -27,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
         etEmail = findViewById(R.id.etEmail)
@@ -42,14 +50,31 @@ class LoginActivity : AppCompatActivity() {
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
-            } else {
-                // Fix: Using the KTX extension prefs.edit { ... }
-                sharedPrefs.edit {
-                    putBoolean("normal_login_done", true)
-                    putString("logged_in_email", email)
-                }
+                return@setOnClickListener
+            }
 
-                goToDashboard()
+            lifecycleScope.launch {
+                val user = db.userDao().getUserByEmailAndPassword(email, password)
+                runOnUiThread {
+                    if (user != null) {
+                        sharedPrefs.edit {
+                            putBoolean("normal_login_done", true)
+                            putString("logged_in_email", email)
+                        }
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Welcome back, ${user.fullName}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        goToDashboard()
+                    } else {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Invalid email or password",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
 
@@ -69,11 +94,8 @@ class LoginActivity : AppCompatActivity() {
     private fun startBiometricLogin() {
         val biometricManager = BiometricManager.from(this)
 
-        // Using BIOMETRIC_STRONG or BIOMETRIC_WEAK depending on security needs
         when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                showBiometricPrompt()
-            }
+            BiometricManager.BIOMETRIC_SUCCESS -> showBiometricPrompt()
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
                 Toast.makeText(this, "No biometric hardware found", Toast.LENGTH_SHORT).show()
             }
@@ -96,11 +118,12 @@ class LoginActivity : AppCompatActivity() {
             this,
             executor,
             object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
                     super.onAuthenticationSucceeded(result)
-
                     val normalLoginDone = sharedPrefs.getBoolean("normal_login_done", false)
-
                     if (normalLoginDone) {
                         Toast.makeText(
                             this@LoginActivity,
@@ -117,14 +140,25 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence
+                ) {
                     super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(this@LoginActivity, errString.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        errString.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Toast.makeText(this@LoginActivity, "Biometric authentication failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Biometric authentication failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
