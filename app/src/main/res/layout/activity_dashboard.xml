@@ -18,7 +18,7 @@
             android:id="@+id/btnMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="☰"
+            android:text="@string/text"
             android:textSize="24sp"
             android:textColor="#FFFFFF"
             tools:ignore="HardcodedText" />
@@ -83,13 +83,13 @@
                 android:id="@+id/tvTransactionCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Transactions: 0" />
+                android:text="@string/transactions_0" />
 
             <TextView
                 android:id="@+id/tvLatestExpense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Latest: None" />
+                android:text="@string/latest_none" />
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -1,10 +1,15 @@
 package com.smartspend
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 
 class DashboardActivity : AppCompatActivity() {
@@ -19,6 +24,15 @@ class DashboardActivity : AppCompatActivity() {
 
         NavigationHelper.setupMenu(this)
 
+        // Setup RecyclerView with empty adapter to prevent crash
+        val rvRecentExpenses = findViewById<RecyclerView>(R.id.rvRecentExpenses)
+        rvRecentExpenses.layoutManager = LinearLayoutManager(this)
+
+        // Quick add expense button
+        findViewById<Button>(R.id.btnQuickAddExpense).setOnClickListener {
+            startActivity(Intent(this, ExpenseActivity::class.java))
+        }
+
         loadDashboardData()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -29,32 +43,45 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun loadDashboardData() {
-
         lifecycleScope.launch {
+            try {
+                val expenses = db.expenseDao().getAllExpenses()
+                val total = expenses.sumOf { it.amount }
+                val count = expenses.size
+                val latest = expenses.lastOrNull()
 
-            val expenses = db.expenseDao().getAllExpenses()
+                // Load goal for budget calculation
+                val goal = db.goalDao().getFeaturedGoal()
+                val budget = goal?.targetAmount ?: 0.0
+                val remaining = budget - total
+                val progress = if (budget > 0) ((total / budget) * 100).toInt() else 0
 
-            // Total spent
-            val total = expenses.sumOf { it.amount }
+                runOnUiThread {
+                    findViewById<TextView>(R.id.tvTotalBudget)?.text =
+                        "R %.2f".format(budget)
 
-            // Number of transactions
-            val count = expenses.size
+                    findViewById<TextView>(R.id.tvTotalSpent)?.text =
+                        "R %.2f".format(total)
 
-            // Latest expense
-            val latest = expenses.lastOrNull()
+                    findViewById<TextView>(R.id.tvRemaining)?.text =
+                        "R %.2f".format(remaining)
 
-            runOnUiThread {
+                    findViewById<TextView>(R.id.tvTransactionCount)?.text =
+                        "Transactions: $count"
 
-                findViewById<TextView>(R.id.tvTotalSpent)?.text =
-                    "Total Spent: R$total"
+                    findViewById<TextView>(R.id.tvLatestExpense)?.text =
+                        latest?.let {
+                            "Latest: ${it.description} - R %.2f".format(it.amount)
+                        } ?: "No expenses yet"
 
-                findViewById<TextView>(R.id.tvTransactionCount)?.text =
-                    "Transactions: $count"
+                    findViewById<ProgressBar>(R.id.progressBudget)?.progress = progress
 
-                findViewById<TextView>(R.id.tvLatestExpense)?.text =
-                    latest?.let {
-                        "Latest: ${it.description} - R${it.amount}"
-                    } ?: "No expenses yet"
+                    // Set up recent expenses list
+                    val rvRecentExpenses = findViewById<RecyclerView>(R.id.rvRecentExpenses)
+                    rvRecentExpenses.adapter = RecentExpensesAdapter(expenses.takeLast(5).reversed())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

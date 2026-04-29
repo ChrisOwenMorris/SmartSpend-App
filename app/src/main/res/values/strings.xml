@@ -161,4 +161,7 @@
     <string name="goal_progress_chart">Goal progress chart</string>
     <string name="menu_button_description">Open menu</string>
     <string name="camera_image_captured">Camera image captured</string>
+    <string name="transactions_0">Transactions: 0</string>
+    <string name="latest_none">Latest: None</string>
+    <string name="save_expense">Save Expense</string>
 </resources>
