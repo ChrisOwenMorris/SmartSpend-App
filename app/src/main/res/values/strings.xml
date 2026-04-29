@@ -119,7 +119,7 @@
     <string name="quick_gas">Quick Gas</string>
     <string name="quick_coffee">Quick Coffee</string>
     <string name="amount_format">R %.2f</string>
-    <string name="comparison_format" formatted="false">%1$s%.1f%% from previous period</string>
+    <string name="comparison_format">%1$s %2$.2f%% vs last period</string>
     <string name="change">Change</string>
     <string name="current_password">Current Password</string>
     <string name="new_password">New Password</string>
@@ -168,4 +168,5 @@
     <string name="face_id">Face ID</string>
     <string name="reports">Reports</string>
     <string name="goals">Goals</string>
+    <string name="set_monthly_budget">Set Monthly Budget</string>
 </resources>

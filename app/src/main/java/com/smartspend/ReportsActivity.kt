@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import android.annotation.SuppressLint
+import androidx.core.graphics.toColorInt
 
 @SuppressLint("NewApi")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -102,20 +103,67 @@ class ReportsActivity : AppCompatActivity() {
         val prevStart = today.minusDays(daysBack * 2).format(formatter)
 
         lifecycleScope.launch {
-
-            // GET TOTAL SPENDING
+            // 1. FETCH BASE DATA FROM DB
             val total = db.expenseDao().getTotalByDateRange(startDate, endDate)
-            tvPeriodLabel.text = label
-            tvTotalAmount.text = getString(R.string.amount_format, total)
-
-            // GET PREVIOUS PERIOD FOR COMPARISON
             val prevTotal = db.expenseDao().getTotalByDateRange(prevStart, startDate)
-            val change = if (prevTotal > 0) ((total - prevTotal) / prevTotal * 100) else 0.0
+
+            // Check your Category class - if it's "total", use that instead of "totalAmount"
+            val topCategories = db.expenseDao().getTopCategoriesWithNames(startDate, endDate)
+
+            // 2. UPDATE SUMMARY TEXT VIEWS
+            tvPeriodLabel.text = label
+            val totalNum = total.toString().toDoubleOrNull() ?: 0.0
+            tvTotalAmount.text = getString(R.string.amount_format, totalNum)
+
+            val previousTotal = prevTotal.toString().toDoubleOrNull() ?: 0.0
+            val change = if (previousTotal > 0) {
+                ((totalNum - previousTotal) / previousTotal * 100)
+            } else {
+                0.0
+            }
             val sign = if (change >= 0) "+" else ""
             tvComparison.text = getString(R.string.comparison_format, sign, change)
 
-            // GET TOP CATEGORIES
-            val topCategories = db.expenseDao().getTopCategoriesWithNames(startDate, endDate)
+            // 3.1 GET TOTALS
+            val totalExpenses = db.expenseDao().getTotalByDateRange(startDate, endDate)
+
+            // 3.2 FETCH REAL INCOME DATA
+            val totalIncome = db.incomeDao().getTotalIncomeByDateRange(startDate, endDate)
+
+            // 3.2. FIND THE VIEW AND SET DATA
+            val incomeExpenseChart = findViewById<IncomeExpenseBarChartView>(R.id.incomeExpenseChart)
+            incomeExpenseChart.setData(totalIncome, totalExpenses)
+
+            // 4. PIE CHART LOGIC
+            val pieData = db.expenseDao().getExpensesGroupedByCategory(startDate, endDate)
+
+            val colorPalette = listOf(
+                "#6A11CB".toColorInt(),
+                "#2575FC".toColorInt(),
+                "#FF5F6D".toColorInt()
+            )
+
+            // Convert CategorySummary to PieSlice
+            val slices = pieData.mapIndexed { index, summary ->
+                PieSlice(
+                    name = summary.categoryName,
+                    value = summary.total,
+                    color = colorPalette[index % colorPalette.size]
+                )
+            }
+
+            findViewById<PieChartView>(R.id.pieChart).setData(slices)
+
+            // 5. TREND DATA (6 MONTHS)
+
+            val sixMonthsAgo = LocalDate.now().minusMonths(6).format(formatter)
+            val trendData = db.expenseDao().getMonthlyTrends(sixMonthsAgo)
+
+            // Find the view and set the data
+            val trendChart = findViewById<TrendChartView>(R.id.trendChart)
+            trendChart.setData(trendData)
+
+            // 5. TOP CATEGORIES LIST
             rvTopMerchants.adapter = TopCategoriesAdapter(topCategories)
         }
     }

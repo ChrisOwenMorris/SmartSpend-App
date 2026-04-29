@@ -17,6 +17,7 @@ import com.smartspend.data.entity.Goal
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 class GoalsActivity : AppCompatActivity() {
 
@@ -148,7 +149,12 @@ class GoalsActivity : AppCompatActivity() {
                         percentage.toInt()
 
                     // Custom PieChartView logic
-                    findViewById<PieChartView>(R.id.pieChartFeatured).setPercentage(percentage)
+                    val pieChart = findViewById<PieChartView>(R.id.pieChartFeatured)
+                    val slices = listOf(
+                        PieSlice("Progress", goal.currentAmount, "#6A11CB".toColorInt()),
+                        PieSlice("Remaining", (goal.targetAmount - goal.currentAmount).coerceAtLeast(0.0), "#F0F0F0".toColorInt())
+                    )
+                    pieChart.setData(slices)
 
                     goal.imagePath?.let { path ->
                         findViewById<ImageView>(R.id.ivFeaturedGoalImage)
@@ -164,7 +170,7 @@ class GoalsActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tvFeaturedGoalAmount).text = "R 0"
                     findViewById<TextView>(R.id.tvFeaturedGoalPercentage).text = "0%"
                     findViewById<ProgressBar>(R.id.progressFeaturedGoal).progress = 0
-                    findViewById<PieChartView>(R.id.pieChartFeatured).setPercentage(0f)
+                    findViewById<PieChartView>(R.id.pieChartFeatured).setData(emptyList())
                 }
             }
         }

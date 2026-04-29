@@ -7,14 +7,17 @@ import androidx.room.RoomDatabase
 import com.smartspend.data.dao.ExpenseDao
 import com.smartspend.data.dao.UserDao
 import com.smartspend.data.dao.GoalDao
+import com.smartspend.data.dao.IncomeDao
 import com.smartspend.data.entity.Category
 import com.smartspend.data.entity.Expense
 import com.smartspend.data.entity.Goal
 import com.smartspend.data.entity.User
+import com.smartspend.data.entity.Income
 
+// Fixed the syntax error in the annotation below
 @Database(
-    entities = [User::class, Category::class, Expense::class, Goal::class],
-    version = 1,
+    entities = [Expense::class, Category::class, Income::class, User::class, Goal::class],
+    version = 2,
     exportSchema = false
 )
 abstract class SmartSpendDatabase : RoomDatabase() {
@@ -22,6 +25,7 @@ abstract class SmartSpendDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun userDao(): UserDao
     abstract fun goalDao(): GoalDao
+    abstract fun incomeDao(): IncomeDao
 
     companion object {
         @Volatile
@@ -33,7 +37,9 @@ abstract class SmartSpendDatabase : RoomDatabase() {
                     context.applicationContext,
                     SmartSpendDatabase::class.java,
                     "smartspend_db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // Useful during development when changing schema
+                    .build()
                 INSTANCE = instance
                 instance
             }
