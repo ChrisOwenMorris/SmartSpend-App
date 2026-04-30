@@ -11,8 +11,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import com.smartspend.data.entity.Expense
-
-
+import com.smartspend.data.database.SmartSpendDatabase
 
 class ExpenseActivity : AppCompatActivity() {
 
@@ -28,11 +27,9 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var btnExpense: Button
     private lateinit var btnIncome: Button
     private lateinit var spCategory: Spinner
-
     private lateinit var btnSave: Button
 
     private var receiptPath: String? = null
-
     private var isExpense = true
     private val calendar = Calendar.getInstance()
 
@@ -51,14 +48,11 @@ class ExpenseActivity : AppCompatActivity() {
         updateDate()
         updateSummary()
 
-
-
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 NavigationHelper.goToDashboard(this@ExpenseActivity)
             }
         })
-        val btnSave = findViewById<Button>(R.id.btnSave)
 
         btnSave.setOnClickListener {
             saveExpense()
@@ -74,11 +68,10 @@ class ExpenseActivity : AppCompatActivity() {
         btnExpense = findViewById(R.id.btnExpense)
         btnIncome = findViewById(R.id.btnIncome)
         spCategory = findViewById(R.id.spCategory)
+        btnSave = findViewById(R.id.btnSave)
     }
 
     private fun setupListeners() {
-
-        // Toggle buttons
         btnExpense.setOnClickListener {
             isExpense = true
             updateSummary()
@@ -89,12 +82,10 @@ class ExpenseActivity : AppCompatActivity() {
             updateSummary()
         }
 
-        // Amount live update
         etAmount.addTextChangedListener {
             updateSummary()
         }
 
-        // Quick Add Buttons
         val quickButtons = listOf(
             "Groceries" to 1200.0,
             "Gas" to 700.0,
@@ -104,7 +95,7 @@ class ExpenseActivity : AppCompatActivity() {
         val buttonBar = findViewById<LinearLayout>(R.id.quick_add_container)
         if (buttonBar != null) {
             for (i in 0 until buttonBar.childCount) {
-                val btn = buttonBar.getChildAt(i) as Button
+                val btn = buttonBar.getChildAt(i) as? Button ?: continue
                 val value = quickButtons.getOrNull(i)?.second ?: 0.0
                 btn.setOnClickListener {
                     etAmount.setText(value.toString())
@@ -138,57 +129,75 @@ class ExpenseActivity : AppCompatActivity() {
     private fun updateSummary() {
         val amount = etAmount.text.toString().toDoubleOrNull() ?: 0.0
         val display = if (isExpense) "-R%.2f".format(amount) else "+R%.2f".format(amount)
-
         tvSummaryAmount.text = display
     }
 
     private fun setupCategorySpinner() {
-        val categories = listOf("Food", "Transport", "Shopping", "Bills", "Other")
-
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            categories
-        )
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spCategory.adapter = adapter
+        lifecycleScope.launch {
+            val categories = db.expenseDao().getAllExpenses().map { it.categoryId }.distinct().sorted()
+            val categoryNames = listOf("Food", "Transport", "Shopping", "Bills", "Other")
+            val adapter = ArrayAdapter(
+                this@ExpenseActivity,
+                android.R.layout.simple_spinner_item,
+                categoryNames
+            )
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            runOnUiThread {
+                spCategory.adapter = adapter
+            }
+        }
     }
 
-    // 🚀 SAVE FUNCTION (CAN BE CALLED LATER FROM BUTTON)
     private fun saveExpense() {
-
-        val amount = etAmount.text.toString().toDoubleOrNull() ?: 0.0
+        val amountStr = etAmount.text.toString()
         val description = etDescription.text.toString()
         val date = etDate.text.toString()
+
+        if (amountStr.isEmpty()) {
+            Toast.makeText(this, "Please enter amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val amount = amountStr.toDoubleOrNull() ?: 0.0
+        if (amount <= 0) {
+            Toast.makeText(this, "Please enter valid amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val categoryId = spCategory.selectedItemPosition + 1
+        val dateFormatted = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
 
         lifecycleScope.launch {
-            db.expenseDao().insert(
-                Expense(
-                    amount = amount,
-                    description = description,
-                    date = date,
-                    startTime = "00:00",
-                    endTime = "00:00",
-                    categoryId = categoryId,
-                    receiptPath = receiptPath,
+            try {
+                db.expenseDao().insert(
+                    Expense(
+                        amount = amount,
+                        description = description,
+                        date = dateFormatted,
+                        startTime = "00:00",
+                        endTime = "23:59",
+                        categoryId = categoryId,
+                        receiptPath = receiptPath
+                    )
                 )
-            )
 
-            Toast.makeText(
-                this@ExpenseActivity,
-                "Expense Saved!",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            clearForm()
+                runOnUiThread {
+                    Toast.makeText(this@ExpenseActivity, "Expense saved successfully!", Toast.LENGTH_SHORT).show()
+                    clearForm()
+                    NavigationHelper.goToDashboard(this@ExpenseActivity)
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@ExpenseActivity, "Error saving expense", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     private fun clearForm() {
         etAmount.text.clear()
         etDescription.text.clear()
+        spCategory.setSelection(0)
         updateSummary()
     }
 }

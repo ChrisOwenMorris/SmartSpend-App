@@ -3,17 +3,17 @@ package com.smartspend
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
-import androidx.appcompat.app.AlertDialog
-import android.widget.EditText
-import android.widget.Toast
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -21,17 +21,17 @@ class DashboardActivity : AppCompatActivity() {
         (application as SmartSpendApp).database
     }
 
+    private lateinit var rvRecentExpenses: RecyclerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
         NavigationHelper.setupMenu(this)
 
-        // Setup RecyclerView with empty adapter to prevent crash
-        val rvRecentExpenses = findViewById<RecyclerView>(R.id.rvRecentExpenses)
+        rvRecentExpenses = findViewById(R.id.rvRecentExpenses)
         rvRecentExpenses.layoutManager = LinearLayoutManager(this)
 
-        // Quick add expense button
         findViewById<Button>(R.id.btnQuickAddExpense).setOnClickListener {
             startActivity(Intent(this, ExpenseActivity::class.java))
         }
@@ -49,34 +49,33 @@ class DashboardActivity : AppCompatActivity() {
         })
     }
 
-    // --- FIXED: Added the missing dialog function ---
     private fun showSetBudgetDialog() {
         val prefs = getSharedPreferences("SmartSpendPrefs", MODE_PRIVATE)
         val currentBudget = prefs.getFloat("monthly_budget", 0f)
 
         val input = EditText(this).apply {
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-            hint = "e.g. 5000"
-            // If a budget already exists, show it in the field
-            if (currentBudget > 0f) setText(currentBudget.toString())
+            this.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            this.hint = "e.g. 5000"
+            if (currentBudget > 0f) {
+                this.setText(currentBudget.toString())
+            }
         }
 
         AlertDialog.Builder(this)
             .setTitle("Set Monthly Budget")
-            .setMessage("Enter your budget for the month (This will sync with your dashboard)")
+            .setMessage("Enter your budget for the month")
             .setView(input)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("Save") { dialog, _ ->
                 val budgetString = input.text.toString()
                 if (budgetString.isNotEmpty()) {
                     val budget = budgetString.toFloat()
                     prefs.edit().putFloat("monthly_budget", budget).apply()
-
-                    // Refresh data after saving
                     loadDashboardData()
                     Toast.makeText(this, "Budget saved!", Toast.LENGTH_SHORT).show()
                 }
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
             .show()
     }
 
@@ -88,38 +87,34 @@ class DashboardActivity : AppCompatActivity() {
                 val count = expenses.size
                 val latest = expenses.lastOrNull()
 
-                // Logic maintained: Checking shared prefs first, then falling back to Goal
                 val prefs = getSharedPreferences("SmartSpendPrefs", MODE_PRIVATE)
                 val savedBudget = prefs.getFloat("monthly_budget", 0f).toDouble()
-
                 val goal = db.goalDao().getFeaturedGoal()
                 val budget = if (savedBudget > 0) savedBudget else (goal?.targetAmount ?: 0.0)
-
                 val remaining = budget - total
-                val progress = if (budget > 0) ((total / budget) * 100).toInt() else 0
+                val progress = if (budget > 0) ((total / budget) * 100).toInt().coerceAtMost(100) else 0
 
                 runOnUiThread {
-                    findViewById<TextView>(R.id.tvTotalBudget)?.text =
-                        "R %.2f".format(budget)
+                    val tvTotalBudget = findViewById<TextView>(R.id.tvTotalBudget)
+                    tvTotalBudget?.text = "R %.2f".format(budget)
 
-                    findViewById<TextView>(R.id.tvTotalSpent)?.text =
-                        "R %.2f".format(total)
+                    val tvTotalSpent = findViewById<TextView>(R.id.tvTotalSpent)
+                    tvTotalSpent?.text = "R %.2f".format(total)
 
-                    findViewById<TextView>(R.id.tvRemaining)?.text =
-                        "R %.2f".format(remaining)
+                    val tvRemaining = findViewById<TextView>(R.id.tvRemaining)
+                    tvRemaining?.text = "R %.2f".format(remaining)
 
-                    findViewById<TextView>(R.id.tvTransactionCount)?.text =
-                        "Transactions: $count"
+                    val tvTransactionCount = findViewById<TextView>(R.id.tvTransactionCount)
+                    tvTransactionCount?.text = "Transactions: $count"
 
-                    findViewById<TextView>(R.id.tvLatestExpense)?.text =
-                        latest?.let {
-                            "Latest: ${it.description} - R %.2f".format(it.amount)
-                        } ?: "No expenses yet"
+                    val tvLatestExpense = findViewById<TextView>(R.id.tvLatestExpense)
+                    tvLatestExpense?.text = latest?.let {
+                        "Latest: ${it.description} - R %.2f".format(it.amount)
+                    } ?: "No expenses yet"
 
-                    findViewById<ProgressBar>(R.id.progressBudget)?.progress = progress
+                    val progressBudget = findViewById<ProgressBar>(R.id.progressBudget)
+                    progressBudget?.progress = progress
 
-                    // Set up recent expenses list
-                    val rvRecentExpenses = findViewById<RecyclerView>(R.id.rvRecentExpenses)
                     rvRecentExpenses.adapter = RecentExpensesAdapter(expenses.takeLast(5).reversed())
                 }
             } catch (e: Exception) {

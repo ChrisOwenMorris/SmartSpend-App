@@ -48,7 +48,6 @@ class TrendChartView @JvmOverloads constructor(
         val barWidth = (chartWidth / data.size) * 0.7f
         val spacing = (chartWidth / data.size) * 0.3f
 
-        // Draw X-Axis
         canvas.drawLine(padding, height - padding, width - padding, height - padding, axisPaint)
 
         data.forEachIndexed { index, summary ->
@@ -59,11 +58,13 @@ class TrendChartView @JvmOverloads constructor(
             val right = left + barWidth
             val bottom = height - padding
 
-            // Draw Bar
-            canvas.drawRect(left, top, right, bottom, barPaint)
-
-            // Draw Month Label (e.g., "04")
-            canvas.drawText(summary.month, left + (barWidth / 2), height - 20f, textPaint)
+            canvas.drawRoundRect(left, top, right, bottom, 8f, 8f, barPaint)
+            canvas.drawText(
+                "%s".format(if (summary.month == "00") "???" else "M%s".format(summary.month.padStart(2, '0'))),
+                left + (barWidth / 2),
+                height - 20f,
+                textPaint
+            )
         }
     }
 }

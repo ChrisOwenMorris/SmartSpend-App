@@ -169,4 +169,15 @@
     <string name="reports">Reports</string>
     <string name="goals">Goals</string>
     <string name="set_monthly_budget">Set Monthly Budget</string>
+    <string name="filter_reports">Filter Reports</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+    <string name="_2024_01">2024-01</string>
+    <string name="all_categories_month_2024_01">All Categories - Month (2024-01)</string>
+    <string name="net_r_0_00">Net: R 0.00</string>
+    <string name="no_data_available">No data available</string>
+    <string name="top_categories">Top Categories</string>
+    <string name="monthly_entries">Monthly Entries</string>
+    <string name="export_report">Export Report</string>
 </resources>

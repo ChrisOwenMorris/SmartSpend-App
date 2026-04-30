@@ -1,9 +1,9 @@
 package com.smartspend
 
+import android.app.DatePickerDialog
 import android.os.Build
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import android.annotation.SuppressLint
+import java.util.*
 import androidx.core.graphics.toColorInt
 
-@SuppressLint("NewApi")
 @RequiresApi(Build.VERSION_CODES.O)
 class ReportsActivity : AppCompatActivity() {
 
@@ -24,13 +23,14 @@ class ReportsActivity : AppCompatActivity() {
         (application as SmartSpendApp).database
     }
 
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    private var selectedMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
+    private var selectedCategoryId = 0
+    private var selectedPeriod = "month"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reports)
 
-        // --- EXISTING NAVIGATION CODE --- //
         NavigationHelper.setupMenu(this)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -39,132 +39,144 @@ class ReportsActivity : AppCompatActivity() {
             }
         })
 
-        // --- VIEWS --- //
+        setupViews()
+        loadReportData()
+    }
+
+    private fun setupViews() {
         val btnWeek = findViewById<Button>(R.id.btnWeek)
         val btnMonth = findViewById<Button>(R.id.btnMonth)
         val btnYear = findViewById<Button>(R.id.btnYear)
-        val tvPeriodLabel = findViewById<TextView>(R.id.tvPeriodLabel)
-        val tvTotalAmount = findViewById<TextView>(R.id.tvTotalAmount)
-        val tvComparison = findViewById<TextView>(R.id.tvComparison)
+        val etMonthPicker = findViewById<EditText>(R.id.etMonthPicker)
+        val spCategoryFilter = findViewById<Spinner>(R.id.spCategoryFilter)
         val rvTopMerchants = findViewById<RecyclerView>(R.id.rvTopMerchants)
-        val btnExport = findViewById<Button>(R.id.btnExport)
+        val rvMonthlyEntries = findViewById<RecyclerView>(R.id.rvMonthlyEntries)
 
-        // --- SETUP RECYCLERVIEW --- //
         rvTopMerchants.layoutManager = LinearLayoutManager(this)
+        rvMonthlyEntries.layoutManager = LinearLayoutManager(this)
 
-        // --- LOAD DEFAULT VIEW (MONTH) --- //
-        loadReport("month", tvPeriodLabel, tvTotalAmount, tvComparison, rvTopMerchants)
+        setupMonthPicker(etMonthPicker)
+        setupCategorySpinner(spCategoryFilter)
 
-        // --- PERIOD BUTTON CLICKS --- //
         btnWeek.setOnClickListener {
-            loadReport("week", tvPeriodLabel, tvTotalAmount, tvComparison, rvTopMerchants)
+            selectedPeriod = "week"
+            loadReportData()
         }
         btnMonth.setOnClickListener {
-            loadReport("month", tvPeriodLabel, tvTotalAmount, tvComparison, rvTopMerchants)
+            selectedPeriod = "month"
+            loadReportData()
         }
         btnYear.setOnClickListener {
-            loadReport("year", tvPeriodLabel, tvTotalAmount, tvComparison, rvTopMerchants)
-        }
-
-        // --- EXPORT BUTTON --- //
-        btnExport.setOnClickListener {
-            // PDF export can be added later
+            selectedPeriod = "year"
+            loadReportData()
         }
     }
 
-    private fun loadReport(
-        period: String,
-        tvPeriodLabel: TextView,
-        tvTotalAmount: TextView,
-        tvComparison: TextView,
-        rvTopMerchants: RecyclerView
-    ) {
-        val today = LocalDate.now()
-        val endDate = today.format(formatter)
-        val daysBack: Long
-        val label: String
+    private fun setupMonthPicker(editText: EditText) {
+        editText.setText(selectedMonth)
+        editText.setOnClickListener {
+            val c = Calendar.getInstance()
+            val monthStart = LocalDate.parse("${selectedMonth}-01")
+            c.timeInMillis = monthStart.atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
 
-        when (period) {
-            "week" -> {
-                daysBack = 7L
-                label = getString(R.string.btn_week)
+            DatePickerDialog(
+                this,
+                { _, year, monthOfYear, _ ->
+                    val monthStr = (monthOfYear + 1).toString().padStart(2, '0')
+                    selectedMonth = "$year-$monthStr"
+                    editText.setText(selectedMonth)
+                    loadReportData()
+                },
+                c.get(Calendar.YEAR),
+                c.get(Calendar.MONTH),
+                1
+            ).show()
+        }
+    }
+
+    private fun setupCategorySpinner(spinner: Spinner) {
+        val categories = listOf("All Categories", "Food", "Transport", "Shopping", "Bills", "Other")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                selectedCategoryId = when (position) {
+                    1 -> 1
+                    2 -> 2
+                    3 -> 3
+                    4 -> 4
+                    5 -> 5
+                    else -> 0
+                }
+                loadReportData()
             }
-            "year" -> {
-                daysBack = 365L
-                label = getString(R.string.btn_year)
-            }
-            else -> {
-                daysBack = 30L
-                label = getString(R.string.btn_month)
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun loadReportData() {
+        val today = LocalDate.now()
+        val monthStart = LocalDate.parse("${selectedMonth}-01")
+        val monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth())
+
+        val startDate = when (selectedPeriod) {
+            "week" -> today.minusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            "year" -> today.minusDays(365).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            else -> monthStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        }
+        val endDate = when (selectedPeriod) {
+            "week" -> today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            "year" -> today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            else -> monthEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         }
 
-        val startDate = today.minusDays(daysBack).format(formatter)
-        val prevStart = today.minusDays(daysBack * 2).format(formatter)
-
         lifecycleScope.launch {
-            // 1. FETCH BASE DATA FROM DB
-            val total = db.expenseDao().getTotalByDateRange(startDate, endDate)
-            val prevTotal = db.expenseDao().getTotalByDateRange(prevStart, startDate)
-
-            // Check your Category class - if it's "total", use that instead of "totalAmount"
-            val topCategories = db.expenseDao().getTopCategoriesWithNames(startDate, endDate)
-
-            // 2. UPDATE SUMMARY TEXT VIEWS
-            tvPeriodLabel.text = label
-            val totalNum = total.toString().toDoubleOrNull() ?: 0.0
-            tvTotalAmount.text = getString(R.string.amount_format, totalNum)
-
-            val previousTotal = prevTotal.toString().toDoubleOrNull() ?: 0.0
-            val change = if (previousTotal > 0) {
-                ((totalNum - previousTotal) / previousTotal * 100)
+            val allExpenses = db.expenseDao().getExpensesByDateRange(startDate, endDate)
+            val filteredExpenses = if (selectedCategoryId > 0) {
+                allExpenses.filter { it.categoryId == selectedCategoryId }
             } else {
-                0.0
+                allExpenses
             }
-            val sign = if (change >= 0) "+" else ""
-            tvComparison.text = getString(R.string.comparison_format, sign, change)
 
-            // 3.1 GET TOTALS
-            val totalExpenses = db.expenseDao().getTotalByDateRange(startDate, endDate)
-
-            // 3.2 FETCH REAL INCOME DATA
+            val totalExpenses = filteredExpenses.sumOf { it.amount }
             val totalIncome = db.incomeDao().getTotalIncomeByDateRange(startDate, endDate)
-
-            // 3.2. FIND THE VIEW AND SET DATA
-            val incomeExpenseChart = findViewById<IncomeExpenseBarChartView>(R.id.incomeExpenseChart)
-            incomeExpenseChart.setData(totalIncome, totalExpenses)
-
-            // 4. PIE CHART LOGIC
+            val topCategories = db.expenseDao().getTopCategoriesWithNames(startDate, endDate)
             val pieData = db.expenseDao().getExpensesGroupedByCategory(startDate, endDate)
-
-            val colorPalette = listOf(
-                "#6A11CB".toColorInt(),
-                "#2575FC".toColorInt(),
-                "#FF5F6D".toColorInt()
-            )
-
-            // Convert CategorySummary to PieSlice
-            val slices = pieData.mapIndexed { index, summary ->
-                PieSlice(
-                    name = summary.categoryName,
-                    value = summary.total,
-                    color = colorPalette[index % colorPalette.size]
-                )
-            }
-
-            findViewById<PieChartView>(R.id.pieChart).setData(slices)
-
-            // 5. TREND DATA (6 MONTHS)
-
-            val sixMonthsAgo = LocalDate.now().minusMonths(6).format(formatter)
+            val sixMonthsAgo = today.minusMonths(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             val trendData = db.expenseDao().getMonthlyTrends(sixMonthsAgo)
 
-            // Find the view and set the data
-            val trendChart = findViewById<TrendChartView>(R.id.trendChart)
-            trendChart.setData(trendData)
+            runOnUiThread {
+                val categoryName = if (selectedCategoryId > 0) getCategoryName(selectedCategoryId) else "All Categories"
+                findViewById<TextView>(R.id.tvPeriodLabel).text = "$categoryName - $selectedPeriod ($selectedMonth)"
+                findViewById<TextView>(R.id.tvTotalAmount).text = "R %.2f".format(totalExpenses)
+                findViewById<TextView>(R.id.tvComparison).text = "Net: R %.2f (Income: R %.2f)".format(totalIncome - totalExpenses, totalIncome)
 
-            // 5. TOP CATEGORIES LIST
-            rvTopMerchants.adapter = TopCategoriesAdapter(topCategories)
+                findViewById<IncomeExpenseBarChartView>(R.id.incomeExpenseChart).setData(totalIncome, totalExpenses)
+
+                val colorPalette = listOf("#6A11CB", "#2575FC", "#FF5F6D", "#10B981", "#F59E0B").map { it.toColorInt() }
+                val slices = pieData.take(5).mapIndexed { index, summary ->
+                    com.smartspend.PieSlice(summary.categoryName ?: "Other", summary.total, colorPalette[index % colorPalette.size])
+                }
+                findViewById<com.smartspend.PieChartView>(R.id.pieChart).setData(slices)
+
+                findViewById<com.smartspend.TrendChartView>(R.id.trendChart).setData(trendData)
+
+                findViewById<RecyclerView>(R.id.rvTopMerchants).adapter = TopCategoriesAdapter(topCategories)
+                findViewById<RecyclerView>(R.id.rvMonthlyEntries).adapter = MonthlyEntriesAdapter(filteredExpenses)
+            }
+        }
+    }
+
+    private fun getCategoryName(id: Int): String {
+        return when (id) {
+            1 -> "Food"
+            2 -> "Transport"
+            3 -> "Shopping"
+            4 -> "Bills"
+            5 -> "Other"
+            else -> "Unknown"
         }
     }
 }
