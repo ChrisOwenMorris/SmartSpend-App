@@ -1,6 +1,7 @@
 package com.smartspend
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
@@ -184,7 +185,11 @@ class ExpenseActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(this@ExpenseActivity, "Expense saved successfully!", Toast.LENGTH_SHORT).show()
                     clearForm()
-                    NavigationHelper.goToDashboard(this@ExpenseActivity)
+
+                    val intent = Intent(this@ExpenseActivity, DashboardActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    startActivity(intent)
+                    finish()
                 }
             } catch (e: Exception) {
                 runOnUiThread {

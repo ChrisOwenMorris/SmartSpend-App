@@ -49,6 +49,11 @@ class DashboardActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadDashboardData()
+    }
+
     private fun showSetBudgetDialog() {
         val prefs = getSharedPreferences("SmartSpendPrefs", MODE_PRIVATE)
         val currentBudget = prefs.getFloat("monthly_budget", 0f)
