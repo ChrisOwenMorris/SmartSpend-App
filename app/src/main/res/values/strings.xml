@@ -180,4 +180,20 @@
     <string name="top_categories">Top Categories</string>
     <string name="monthly_entries">Monthly Entries</string>
     <string name="export_report">Export Report</string>
+    <string name="save_income">Save Income</string>
+    <string name="bonus">Bonus</string>
+    <string name="freelance">Freelance</string>
+    <string name="salary">Salary</string>
+    <string name="quick_add">Quick Add</string>
+    <string name="select_date">Select date</string>
+    <string name="summary">SUMMARY</string>
+    <string name="notes">Notes</string>
+    <string name="description_optional">Description (Optional)</string>
+    <string name="date">Date</string>
+    <string name="select_income_source">Select income source</string>
+    <string name="source">Source</string>
+    <string name="amount">Amount</string>
+    <string name="income">Income</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="select_month">Select Month</string>
 </resources>

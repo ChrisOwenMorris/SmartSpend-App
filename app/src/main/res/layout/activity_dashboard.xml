@@ -68,6 +68,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <EditText
+                android:id="@+id/etMonthSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/card_background"
+                android:gravity="center"
+                android:hint="@string/select_month"
+                android:inputType="none"
+                android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+                android:drawablePadding="8dp"
+                android:padding="12dp" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSetBudget"
                 android:layout_width="match_parent"
@@ -188,7 +201,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Recent Transactions"
+                android:text="@string/recent_transactions"
                 android:textStyle="bold"
                 android:layout_marginTop="20dp"
                 android:textColor="#333333"/>
